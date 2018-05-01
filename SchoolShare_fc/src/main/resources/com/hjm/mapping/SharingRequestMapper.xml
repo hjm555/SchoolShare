@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper  namespace="com.hjm.dao.SharingRequestDao">
+    <resultMap id="requestResult" type="com.hjm.model.SharingRequest">
+        <id column="id" property="id"/>
+        <result column="state" property="state"/>
+        <result column="request_time" property="requestTime"/>
+        <association column="ownerId" property="owner" select="com.hjm.dao.UserDao.getById"/>
+        <association column="requesterId" property="requester" select="com.hjm.dao.UserDao.getById"/>
+        <association column="goodId" property="good" select="com.hjm.dao.GoodDao.getById"/>
+    </resultMap>
+
+    <select id="getOwnerList" resultMap="requestResult">
+        select * from hjm_sharing_request
+        where ownerId=#{owner.id}
+    </select>
+
+    <select id="getRequesterList" resultMap="requestResult">
+        select * from hjm_sharing_request
+        where requesterId=#{requester.id}
+    </select>
+
+    <insert id="insert">
+        insert into hjm_sharing_request(id,goodId,ownerId,requesterId,request_time,state)
+        value(#{id},#{good.id},#{owner.id},#{requester.id},#{requestTime},#{state})
+    </insert>
+
+    <delete id="delete">
+        delete from hjm_sharing_request
+        where id=#{id}
+    </delete>
+
+    <update id="update">
+        update hjm_sharing_request
+        set state='已处理'
+        where id=#{id}
+    </update>
+
+</mapper>

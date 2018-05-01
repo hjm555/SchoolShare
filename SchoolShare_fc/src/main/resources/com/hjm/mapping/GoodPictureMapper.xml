@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hjm.dao.GoodPictureDao">
+
+    <delete id="delete">
+        delete from hjm_picture
+        where url=#{url}
+    </delete>
+
+    <delete id="deleteAll">
+        delete from hjm_picture
+        where goodId=#{id}
+    </delete>
+
+    <insert id="insert">
+        insert into hjm_picture(id,url,goodId) values(#{id},#{url},#{goodId})
+    </insert>
+</mapper>

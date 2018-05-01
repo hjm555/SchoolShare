@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hjm.dao.MessageDao">
+    <resultMap id="msgResult" type="com.hjm.model.Message">
+        <result column="message" property="message"/>
+        <result column="send_time" property="sendTime"/>
+        <association column="receiverId" property="receiver" select="com.hjm.dao.UserDao.getById"/>
+        <association column="senderId" property="sender" select="com.hjm.dao.UserDao.getById"/>
+    </resultMap>
+
+    <insert id="sendOne">
+        insert into hjm_message(senderId,receiverId,message,send_time,state)
+        values(sender.id,receiver.id,message,sendTime,'未读')
+    </insert>
+
+    <update id="update">
+        update hjm_message
+        set state='已读'
+        where receiverId=#{receiver.id}
+    </update>
+
+    <select id="getAllMessage" resultMap="msgResult">
+        select message,send_time,receiverId,senderId from hjm_message
+        where receiverId=#{receiver.id} and state='未读'
+        order by send_time ASC
+    </select>
+</mapper>

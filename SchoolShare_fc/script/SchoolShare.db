@@ -1,0 +1,100 @@
+create table hjm_user(
+	id nvarchar(36) PRIMARY KEY,
+	name nvarchar(20) not null unique,
+	password nvarchar(30) not null,
+	phone_number nvarchar(11) unique,
+	sex nvarchar(1),
+	url nvarchar(50)
+);
+
+create table hjm_good(
+    id nvarchar(36) primary key,
+    name nvarchar(20) not null,
+    ownerId nvarchar(36) not null,
+    type nvarchar(10),
+    state nvarchar(10) not null DEFAULT '未共享',
+    description nvarchar(200),
+    borrowerId nvarchar(36),
+    release_time DATETIME,
+    foreign key(ownerId) references hjm_user(id),
+    foreign key(borrowerId) references hjm_user(id),
+    index(name)
+);
+
+create table hjm_picture(
+    id nvarchar(36) primary key,
+    url nvarchar(50) not null unique,
+    goodId nvarchar(36) not null,
+    foreign key(goodId) references hjm_good(id) ON DELETE CASCADE
+);
+
+create table hjm_sharing_request(
+    id nvarchar(36) PRIMARY KEY,
+    goodId nvarchar(36) not null,
+    ownerId nvarchar(36) not null,
+    requesterId nvarchar(36) not null,
+    request_time DATETIME,
+    state nvarchar(10) DEFAULT '未处理',
+    foreign key(goodId) references hjm_good(id),
+    foreign key(ownerId) references hjm_user(id),
+    foreign key(requesterId) references hjm_user(id)
+);
+
+create table hjm_message(
+    senderId nvarchar(36) not null,
+    receiverId nvarchar(36) not null,
+    message nvarchar(200),
+    send_time DATETIME,
+    state nvarchar(10),
+    primary key(senderId,receiverId),
+    foreign key(senderId) references hjm_user(id),
+    foreign key(receiverId) references hjm_user(id)
+);
+
+insert into hjm_user(id,name,password,phone_number,sex,url)
+values("001","1001","123456","15016241165","男","www.1001.com");
+
+insert into hjm_user(id,name,password,phone_number,sex,url)
+values("002","1002","123789","15016241166","女","www.1002.com");
+
+insert into hjm_user(id,name,password,phone_number,sex,url)
+values("003","1003","456789","15016241167","男","www.1003.com");
+
+insert into hjm_good(id,name,ownerId,type,state,description,borrowerId,release_time)
+values("001","小米6","001","电子产品","未共享","柔光双摄,照亮你的美!",null,"2018-04-30 06:13:10");
+
+insert into hjm_good(id,name,ownerId,type,state,description,borrowerId,release_time)
+values("002","华硕笔记本电脑","003","电子产品","已共享","华硕品质，坚若磐石!","002","2018-04-30 07:13:10");
+
+insert into hjm_good(id,name,ownerId,type,state,description,borrowerId,release_time)
+values("003","苹果耳机","002","电子产品","未共享","动听音质!",null,"2018-04-28 09:15:18");
+
+insert into hjm_picture(id,url,goodId)
+values("001","c:\picture\001001.png","001");
+
+insert into hjm_picture(id,url,goodId)
+values("002","c:\picture\001002.png","001");
+
+insert into hjm_picture(id,url,goodId)
+values("003","c:\picture\002003.png","002");
+
+insert into hjm_picture(id,url,goodId)
+values("004","c:\picture\003004.png","003");
+
+insert into hjm_sharing_request(id,goodId,ownerId,requesterId,request_time,state)
+values("001","001","001","003","2018-04-30 06:22:51","未处理");
+
+insert into hjm_sharing_request(id,goodId,ownerId,requesterId,request_time,state)
+values("002","002","003","002","2018-04-30 06:23:51","已处理");
+
+insert into hjm_sharing_request(id,goodId,ownerId,requesterId,request_time,state)
+values("003","003","002","001","2018-04-30 06:24:51","未处理");
+
+insert into hjm_message(senderId,receiverId,message,send_time,state)
+values("003","001","您好,您的小米6还在吗?","2018-04-30 06:27:55","未读");
+
+insert into hjm_message(senderId,receiverId,message,send_time,state)
+values("001","002","您好,您的苹果耳机还在吗?","2018-04-30 06:29:33","已读");
+
+insert into hjm_message(senderId,receiverId,message,send_time,state)
+values("002","001","您好,我的耳机还在的.","2018-04-30 06:30:54","未读");
