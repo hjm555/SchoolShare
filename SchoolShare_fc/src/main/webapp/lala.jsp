@@ -7,7 +7,7 @@
 --%>
 <%@page contentType="text/html; charset=UTF-8"
         pageEncoding="UTF-8" import="java.util.*"%>
-辣辣，I LOVE YOU.
+辣辣，I LOVE YOU.[害羞]
 <br>
 来自：咖啡
 <br>

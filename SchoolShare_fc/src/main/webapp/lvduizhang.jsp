@@ -7,7 +7,7 @@
 --%>
 <%@page contentType="text/html; charset=UTF-8"
         pageEncoding="UTF-8" import="java.util.*"%>
-绿队长，晚上好啊
+绿队长，晚上好啊.
 <br>
 来自：咖啡
 <br>
