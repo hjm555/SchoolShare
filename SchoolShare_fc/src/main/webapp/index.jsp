@@ -1,5 +1,6 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <body>
-<h2>我的辣，惊不惊喜，意不意外，哈哈。来自咖啡的问候。</h2>
+<h2>Hello World!</h2>
 </body>
 </html>
