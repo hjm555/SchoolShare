@@ -20,7 +20,9 @@
     <insert id="insertList">
         insert into hjm_picture(url, goodId) values
         <foreach collection="urls" item="item" separator=",">
-            (#{item}, id)
+            <if test="item!=null and item!=''">
+                (#{item}, id)
+            </if>
         </foreach>
     </insert>
 </mapper>

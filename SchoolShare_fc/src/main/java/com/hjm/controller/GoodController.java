@@ -56,6 +56,7 @@ public class GoodController {
         goodService.insert(good);
         Good newgood=new Good();
         newgood=goodService.getOne(good);
+        newgood.setUrls(urls);
         goodPictureService.insertList(newgood);
         request.getSession().removeAttribute("urls");
         return ReturnMap.success(newgood);
@@ -68,7 +69,12 @@ public class GoodController {
         User user = (User)request.getSession().getAttribute("user");
         if (user==null)
             return ReturnMap.error(12, "用户未登录");
+
+        List<String> urls = (List<String>)request.getSession().getAttribute("urls") ;
+        good.setUrls(urls);
+        goodPictureService.insertList(good);
         goodService.update(good);
+        request.getSession().removeAttribute("urls");
         return ReturnMap.success(good);
     }
 
