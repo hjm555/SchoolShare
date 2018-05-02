@@ -77,4 +77,12 @@ public class Good {
     public void setBorrower(User borrower) {
         this.borrower = borrower;
     }
+
+    public Date getReleaseTime() {
+        return releaseTime;
+    }
+
+    public void setReleaseTime(Date releaseTime) {
+        this.releaseTime = releaseTime;
+    }
 }
