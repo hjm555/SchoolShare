@@ -54,14 +54,13 @@ public class GoodController {
         if (user==null)
             return ReturnMap.error(12, "用户未登录");
         good.setId(UUID.randomUUID().toString());
+        good.setOwner(user);
         List<String> urls = (List<String>)request.getSession().getAttribute("urls") ;
         goodService.insert(good);
-        Good newgood=new Good();
-        newgood=goodService.getOne(good);
-        newgood.setUrls(urls);
-        goodPictureService.insertList(newgood);
+        good.setUrls(urls);
+        goodPictureService.insertList(good);
         request.getSession().removeAttribute("urls");
-        return ReturnMap.success(newgood);
+        return ReturnMap.success(good);
     }
 
     @RequestMapping("/update")
@@ -74,6 +73,8 @@ public class GoodController {
 
         List<String> urls = (List<String>)request.getSession().getAttribute("urls") ;
         good.setUrls(urls);
+        good.setOwner(user);
+        goodPictureService.deleteAll(good);
         goodPictureService.insertList(good);
         goodService.update(good);
         request.getSession().removeAttribute("urls");
