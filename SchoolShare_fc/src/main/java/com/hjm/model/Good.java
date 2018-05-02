@@ -1,5 +1,6 @@
 package com.hjm.model;
 
+import java.util.Date;
 import java.util.List;
 
 public class Good {
@@ -9,6 +10,7 @@ public class Good {
     private String description;   //物品描述
     private String state;         //物品的共享状态
     private List<String> urls;    //物品图片的URL链接
+    private Date releaseTime;     //物品发布时间
     private User owner;           //物品的主人用户
     private User borrower;        //获得物品共享资格的用户
 
