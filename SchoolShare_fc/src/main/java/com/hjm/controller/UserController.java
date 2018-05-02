@@ -61,7 +61,9 @@ public class UserController {
     @RequestMapping("/login")
     @ResponseBody
     public Map login(@RequestBody User loginUser, HttpServletRequest request){
-
+        if(loginUser.getName()==null || loginUser.getPassword()==null ||
+                "".equals(loginUser.getName()) || "".equals(loginUser.getPassword()))
+            return ReturnMap.error(11, "请输入用户名或密码");
         //用户名和密码都不能为空
         if(userService.getOne(loginUser)==null)
             return ReturnMap.error(10, "用户名或密码错误");

@@ -7,6 +7,7 @@ import com.hjm.service.GoodPictureService;
 import com.hjm.service.GoodService;
 import com.hjm.utils.FileConfig;
 import com.hjm.utils.ReturnMap;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,7 @@ public class GoodController {
     private GoodPictureService goodPictureService;
     @Autowired
     private FileConfig fileConfig;
+    private Logger logger=Logger.getLogger(GoodController.class);
 
     @RequestMapping("/homePage")
     @ResponseBody
@@ -94,6 +96,7 @@ public class GoodController {
         int index = fileFullName.lastIndexOf(".");
         String type = fileFullName.substring(index+1, fileFullName.length());
         String newFileName = UUID.randomUUID().toString()+"."+type;
+        logger.info(newFileName);
 
         //新建文件target，指定其路径（URL）
         File target = new File(fileConfig.getPath()+"/resources/user/"+user.getId()+"/"+newFileName);
