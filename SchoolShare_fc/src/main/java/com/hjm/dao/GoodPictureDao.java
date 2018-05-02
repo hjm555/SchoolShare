@@ -6,4 +6,5 @@ public interface GoodPictureDao {
     void delete(String url);
     void deleteAll(Good good);
     void insert(String url,Good good);
+    void insertList(Good good);
 }

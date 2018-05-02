@@ -53,4 +53,9 @@
         <property name="dataSource" ref="dataSource" />
     </bean>
 
+    <bean id="fileConfig" name="fileConfig"
+          class="com.hjm.utils.FileConfig">
+        <property name="path" value="~"/>
+    </bean>
+
 </beans>

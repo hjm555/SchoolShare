@@ -30,4 +30,9 @@ public class GoodPictureDaoImpl extends SqlSessionDaoSupport implements GoodPict
         map.put("url", url);
         map.put("good", good);
         this.getSqlSession().insert("com.hjm.IGoodPictureDao.update",map);}
+
+    @Override
+    public void insertList(Good good) {
+        this.getSqlSession().insert("com.hjm.dao.GoodPictureDao.insertList", good);
+    }
 }

@@ -20,4 +20,9 @@ public class GoodPictureServiceImpl implements GoodPictureService {
 
     @Override
     public void insert(String url,Good good) { goodPictureDao.insert(url,good);}
+
+    @Override
+    public void insertList(Good good) {
+        goodPictureDao.insertList(good);
+    }
 }

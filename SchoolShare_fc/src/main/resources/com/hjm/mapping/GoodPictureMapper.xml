@@ -14,6 +14,13 @@
     </delete>
 
     <insert id="insert">
-        insert into hjm_picture(id,url,goodId) values(#{id},#{url},#{goodId})
+        insert into hjm_picture(url,goodId) values(#{url},#{id})
+    </insert>
+
+    <insert id="insertList">
+        insert into hjm_picture(url, goodId) values
+        <foreach collection="urls" item="item" separator=",">
+            (#{item}, id)
+        </foreach>
     </insert>
 </mapper>

@@ -3,6 +3,7 @@ package com.hjm.controller;
 import com.alibaba.fastjson.JSON;
 import com.hjm.model.User;
 import com.hjm.service.UserService;
+import com.hjm.utils.FileConfig;
 import com.hjm.utils.ReturnMap;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +29,8 @@ public class UserController {
     Logger logger = Logger.getLogger("com.hjm.controller.UserController");
     @Autowired
     private UserService userService;
+    @Resource
+    private FileConfig fileConfig;
 
     @RequestMapping("/check")
     @ResponseBody
@@ -146,7 +150,7 @@ public class UserController {
         //创立一个新文件，指定其路径（URL）（文件名为上面新生成的文件名）
         //设置新头像的URL链接（指向新文件），更新用户表中相关用户的URL数据
         //通过transferTo方法将上传的文件写入到新文件中
-        File newPicture = new File("../resources/"+"/user/"+user.getId()+"/"+newFileName);
+        File newPicture = new File(fileConfig.getPath()+"/user/"+user.getId()+"/"+newFileName);
         user.setUrl("/resources/"+"/user/"+user.getId()+"/"+newFileName);
         userService.update(user);
         request.getSession().setAttribute("user", user);
