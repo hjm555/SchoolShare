@@ -3,11 +3,20 @@ package com.hjm.model;
 import java.util.Date;
 
 public class Message {
+    private String id;
     private User sender;        //消息发送者
     private User receiver;      //消息接收者
     private String message;     //消息内容
     private Date sendTime;      //发送时间
     private String state;       //消息接收状态
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public User getSender() {
         return sender;

@@ -5,19 +5,18 @@
     <resultMap id="simpleMap" type="com.hjm.model.User">
         <id column="id" property="id"/>
         <result column="name" property="name"/>
-        <result column="password" property="password"/>
         <result column="phone_number" property="phoneNumber"/>
         <result column="sex" property="sex"/>
         <result column="url" property="url"/>
     </resultMap>
 
     <select id="getById" parameterType="java.lang.String" resultMap="simpleMap">
-        select * from hjm_user
+        select id,name,phone_number,sex,url from hjm_user
         where id = #{id}
     </select>
 
     <select id="getOne" parameterType="com.hjm.model.User" resultMap="simpleMap">
-        select * from hjm_user
+        select id,name,phone_number,sex,url from hjm_user
         where 1=1
         <if test="id != null and id != ''">
             and id = #{id}
@@ -37,7 +36,7 @@
     </select>
 
     <select id="getList" parameterType="com.hjm.model.User" resultMap="simpleMap">
-        select * from hjm_user
+        select id,name,phone_number,sex,url from hjm_user
         where 1=1
         <if test="id != null and id != ''">
             and id = #{id}
@@ -55,7 +54,6 @@
             and sex = #{sex}
         </if>
     </select>
-
 
     <insert id="insert" parameterType="com.hjm.model.User">
         insert into hjm_user(id, name, password, phone_number, sex, url)

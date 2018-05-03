@@ -26,7 +26,8 @@ import java.util.UUID;
 @RequestMapping("/user")
 public class UserController {
 
-    Logger logger = Logger.getLogger("com.hjm.controller.UserController");
+    private Logger logger = Logger.getLogger("com.hjm.controller.UserController");
+
     @Autowired
     private UserService userService;
     @Resource
@@ -69,8 +70,7 @@ public class UserController {
             return ReturnMap.error(10, "用户名或密码错误");
 
         //根据前端发送过来的User对象，从用户表中查找相关用户,并把查找到的用户对象赋值给新建User对象user
-        User user=new User();
-        user=userService.getOne(loginUser);
+        User user=userService.getOne(loginUser);
         user.setPassword(null);
         //如果查找成功，则HttpServletRequest对象保存user，以便进行其他操作前进行登录检查
         request.getSession().setAttribute("user", user);
@@ -104,8 +104,8 @@ public class UserController {
         if (user==null)
             return ReturnMap.error(12, "用户未登录");
 
-        nUser=userService.getOne(nUser);
-        nUser.setPassword(null);
+        if (nUser.getId()==null)nUser=user;
+        else nUser=userService.getOne(nUser);
         return ReturnMap.success(nUser);
     }
 

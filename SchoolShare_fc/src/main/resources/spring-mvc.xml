@@ -41,4 +41,10 @@
         <property name="resolveLazily" value="true"/>
     </bean>
 
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <!-- forword view name -->
+        <property name="prefix" value="/WEB-INF/jsp/" />
+        <property name="suffix" value=".jsp" />
+    </bean>
+
 </beans>

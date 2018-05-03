@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class MessageServiceImpl implements MessageService {
@@ -15,6 +16,7 @@ public class MessageServiceImpl implements MessageService {
     private MessageDao messageDao;
     @Override
     public void sendOne(Message message) {
+        message.setId(UUID.randomUUID().toString());
         messageDao.sendOne(message);
     }
 

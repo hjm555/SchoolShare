@@ -1,36 +1,54 @@
-package me.gacl.websocket;
+package com.hjm.controller;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.hjm.model.Message;
+import com.hjm.model.User;
+import com.hjm.service.MessageService;
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.socket.server.standard.SpringConfigurator;
 
 import java.io.IOException;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.websocket.*;
+import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
 /**
  * @ServerEndpoint 注解是一个类层次的注解，它的功能主要是将目前的类定义成一个websocket服务器端,
  * 注解的值将被用于监听用户连接的终端访问URL地址,客户端可以通过这个URL来连接到WebSocket服务器端
  */
-@ServerEndpoint("/websocket")
+@Controller
+@ServerEndpoint(value = "/websocket/{userId}", configurator = SpringConfigurator.class)
 public class WebSocketTest {
-    //静态变量，用来记录当前在线连接数。应该把它设计成线程安全的。
-    private static int onlineCount = 0;
+    private static Map<String, Session> map = new HashMap<>();
+    Logger logger = Logger.getLogger(WebSocketTest.class);
 
-    //concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。若要实现服务端与单一客户端通信的话，可以使用Map来存放，其中Key可以为用户标识
-    private static CopyOnWriteArraySet<WebSocketTest> webSocketSet = new CopyOnWriteArraySet<WebSocketTest>();
+    @Resource
+    private MessageService messageService;
 
-    //与某个客户端的连接会话，需要通过它来给客户端发送数据
-    private Session session;
+    private String id;
 
     /**
      * 连接建立成功调用的方法
      * @param session  可选的参数。session为与某个客户端的连接会话，需要通过它来给客户端发送数据
      */
     @OnOpen
-    public void onOpen(Session session){
-        this.session = session;
-        webSocketSet.add(this);     //加入set中
-        addOnlineCount();           //在线数加1
-        System.out.println("有新连接加入！当前在线人数为" + getOnlineCount());
+    public void onOpen(Session session, @PathParam("userId")String id)throws IOException{
+        this.id=id;
+        set(id, session);
+        User user=new User();
+        user.setId(id);
+        List<Message> list = messageService.getAllMessage(user);
+        messageService.update(user);
+        String res = JSON.toJSONString(list, SerializerFeature.DisableCircularReferenceDetect);
+        logger.info(res);
+        session.getBasicRemote().sendText(res);
     }
 
     /**
@@ -38,28 +56,19 @@ public class WebSocketTest {
      */
     @OnClose
     public void onClose(){
-        webSocketSet.remove(this);  //从set中删除
-        subOnlineCount();           //在线数减1
-        System.out.println("有一连接关闭！当前在线人数为" + getOnlineCount());
+        remove(id);
     }
 
-    /**
-     * 收到客户端消息后调用的方法
-     * @param message 客户端发送过来的消息
-     * @param session 可选的参数
-     */
     @OnMessage
-    public void onMessage(String message, Session session) {
-        System.out.println("来自客户端的消息:" + message);
-        //群发消息
-        for(WebSocketTest item: webSocketSet){
-            try {
-                item.sendMessage(message);
-            } catch (IOException e) {
-                e.printStackTrace();
-                continue;
-            }
+    public void onMessage(String msg, Session session) throws IOException{
+        Message message= JSON.parseObject(msg, Message.class);
+        Session toSession = get(message.getReceiver().getId());
+        if (toSession!=null){
+            toSession.getBasicRemote().sendText("["+msg+"]");
+            message.setState("已读");
         }
+        else  message.setState("未读");
+        messageService.sendOne(message);
     }
 
     /**
@@ -73,25 +82,15 @@ public class WebSocketTest {
         error.printStackTrace();
     }
 
-    /**
-     * 这个方法与上面几个方法不一样。没有用注解，是根据自己需要添加的方法。
-     * @param message
-     * @throws IOException
-     */
-    public void sendMessage(String message) throws IOException{
-        this.session.getBasicRemote().sendText(message);
-        //this.session.getAsyncRemote().sendText(message);
+    private static synchronized void set(String id, Session session){
+        map.put(id, session);
     }
 
-    public static synchronized int getOnlineCount() {
-        return onlineCount;
+    private static synchronized Session get(String id) {
+        return map.get(id);
     }
 
-    public static synchronized void addOnlineCount() {
-        WebSocketTest.onlineCount++;
-    }
-
-    public static synchronized void subOnlineCount() {
-        WebSocketTest.onlineCount--;
+    private static synchronized void remove(String id) {
+        map.remove(id);
     }
 }

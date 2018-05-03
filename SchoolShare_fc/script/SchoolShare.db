@@ -4,7 +4,7 @@ create table hjm_user(
 	password nvarchar(30) not null,
 	phone_number nvarchar(11) unique,
 	sex nvarchar(1),
-	url nvarchar(512)
+	url nvarchar(512) DEFAULT '/resources/DefaultUserHeadPicture.png'
 );
 
 create table hjm_good(
@@ -41,12 +41,12 @@ create table hjm_sharing_request(
 );
 
 create table hjm_message(
+    id nvarchar(36) primary key,
     senderId nvarchar(36) not null,
     receiverId nvarchar(36) not null,
     message nvarchar(200),
     send_time timestamp DEFAULT CURRENT_TIMESTAMP,
     state nvarchar(10),
-    primary key(senderId,receiverId),
     foreign key(senderId) references hjm_user(id),
     foreign key(receiverId) references hjm_user(id)
 );
