@@ -55,7 +55,7 @@
 
     <bean id="fileConfig" name="fileConfig"
           class="com.hjm.utils.FileConfig">
-        <property name="path" value="/home/ubuntu"/>
+        <property name="path" value="D:"/>
     </bean>
 
 </beans>

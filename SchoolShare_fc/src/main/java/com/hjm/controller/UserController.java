@@ -140,13 +140,12 @@ public class UserController {
         //获得上传文件的全名，在全名中识别出文件类型，根据文件类型由系统生成一个全新的文件名（防止重复）
         // 把文件名保存在newFileName字符串中
         String fileFullName = file.getOriginalFilename();
-        int index = fileFullName.lastIndexOf(".");
-        String type = fileFullName.substring(index+1, fileFullName.length());
+        String type = fileFullName.substring(fileFullName.lastIndexOf(".")+1,fileFullName.length());
         String newFileName = UUID.randomUUID().toString()+"."+type;
 
         //获得旧头像的URL链接，根据URL找到旧头像的图片文件并删除
         String oldUrl=user.getUrl();
-        File oldPicture=new File("../"+oldUrl);
+        File oldPicture=new File(fileConfig.getPath()+oldUrl);
         if(oldPicture.exists()){oldPicture.delete();}
 
         //创立一个新文件，指定其路径（URL）（文件名为上面新生成的文件名）

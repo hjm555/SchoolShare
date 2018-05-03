@@ -4,7 +4,7 @@ create table hjm_user(
 	password nvarchar(30) not null,
 	phone_number nvarchar(11) unique,
 	sex nvarchar(1),
-	url nvarchar(50)
+	url nvarchar(512)
 );
 
 create table hjm_good(
@@ -22,9 +22,9 @@ create table hjm_good(
 );
 
 create table hjm_picture(
-    id nvarchar(36) primary key,
-    url nvarchar(50) not null unique,
+    url nvarchar(512) not null unique,
     goodId nvarchar(36) not null,
+    primary key(goodId, url),
     foreign key(goodId) references hjm_good(id) ON DELETE CASCADE
 );
 

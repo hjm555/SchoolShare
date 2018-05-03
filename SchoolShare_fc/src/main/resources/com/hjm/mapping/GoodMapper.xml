@@ -7,6 +7,7 @@
         <result column="name" property="name"/>
         <result column="type" property="type"/>
         <result column="description" property="description"/>
+        <result column="release_time" property="releaseTime"/>
         <association column="ownerId" property="owner" select="com.hjm.dao.UserDao.getById"/>
         <collection  column="id" property="urls" select="selectImage"/>
     </resultMap>
@@ -71,7 +72,7 @@
     </select>
 
     <select id="homePage" resultMap="simple">
-        select * from hjm_good
+        select * from hjm_good where state='未共享'
         order by release_time DESC
     </select>
 
@@ -86,8 +87,8 @@
     </select>
 
     <insert id="insert">
-        insert into hjm_good(id,name,type,description,ownerId,borrowerId,state,release_time)
-        value(#{id},#{name},#{type},#{description},#{owner.id},#{borrower.id},#{state},#{releaseTime})
+        insert into hjm_good(id,name,type,description,ownerId,release_time)
+        value(#{id},#{name},#{type},#{description},#{owner.id},#{releaseTime})
     </insert>
 
     <update id="update">

@@ -21,7 +21,7 @@
         insert into hjm_picture(url, goodId) values
         <foreach collection="urls" item="item" separator=",">
             <if test="item!=null and item!=''">
-                (#{item}, id)
+                (#{item}, #{id})
             </if>
         </foreach>
     </insert>

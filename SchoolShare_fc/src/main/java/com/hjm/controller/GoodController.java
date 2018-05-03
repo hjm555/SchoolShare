@@ -1,6 +1,7 @@
 package com.hjm.controller;
 
 
+import com.alibaba.fastjson.JSON;
 import com.hjm.model.Good;
 import com.hjm.model.User;
 import com.hjm.service.GoodPictureService;
@@ -44,10 +45,13 @@ public class GoodController {
             return ReturnMap.error(12, "用户未登录");
 
         List<Good> goodList=goodService.homePage();
+        logger.info("list:");
+        logger.info(JSON.toJSON(goodList).toString());
         return ReturnMap.success(goodList);
     }
 
     @RequestMapping("/release")
+    @Transactional
     @ResponseBody
     public Map insert(@RequestBody Good good,HttpServletRequest request){
         User user = (User)request.getSession().getAttribute("user");
@@ -94,8 +98,9 @@ public class GoodController {
         //获得上传文件的全名，在全名中识别出文件类型，根据文件类型由系统生成一个全新的文件名（防止重复）
         // 把文件名保存在newFileName字符串中
         String fileFullName = file.getOriginalFilename();
-        int index = fileFullName.lastIndexOf(".");
-        String type = fileFullName.substring(index+1, fileFullName.length());
+        logger.info("fullName"+fileFullName);
+        String type = fileFullName.substring(fileFullName.lastIndexOf(".")+1,fileFullName.length());
+
         String newFileName = UUID.randomUUID().toString()+"."+type;
         logger.info(newFileName);
 
