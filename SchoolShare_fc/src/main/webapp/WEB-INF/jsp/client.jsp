@@ -23,7 +23,7 @@
     var websocket = null;
     <%
         User user = (User)request.getAttribute("user");
-        String url = "ws://192.168.1.167/websocket/"+user.getId();
+        String url = "ws://193.112.163.32/websocket/"+user.getId();
     %>
     //判断当前浏览器是否支持WebSocket
     if ('WebSocket' in window) {
@@ -50,7 +50,7 @@
         console.info(messages);
         for (var index in messages){
             console.info(messages[index]);
-            setMessageInnerHTML(messages[index].sender.id+':'+messages[index].message);
+            setMessageInnerHTML(messages[index].sender.name+':'+messages[index].message);
         }
     }
 
