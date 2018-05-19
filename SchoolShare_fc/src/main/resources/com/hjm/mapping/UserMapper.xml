@@ -11,12 +11,12 @@
     </resultMap>
 
     <select id="getById" parameterType="java.lang.String" resultMap="simpleMap">
-        select id,name,phone_number,sex,url from hjm_user
+        select id,name,phone_number,sex,url from user_user
         where id = #{id}
     </select>
 
     <select id="getOne" parameterType="com.hjm.model.User" resultMap="simpleMap">
-        select id,name,phone_number,sex,url from hjm_user
+        select id,name,phone_number,sex,url from user_user
         where 1=1
         <if test="id != null and id != ''">
             and id = #{id}
@@ -36,7 +36,7 @@
     </select>
 
     <select id="getList" parameterType="com.hjm.model.User" resultMap="simpleMap">
-        select id,name,phone_number,sex,url from hjm_user
+        select id,name,phone_number,sex,url from user_user
         where 1=1
         <if test="id != null and id != ''">
             and id = #{id}
@@ -56,12 +56,12 @@
     </select>
 
     <insert id="insert" parameterType="com.hjm.model.User">
-        insert into hjm_user(id, name, password, phone_number, sex, url)
+        insert into user_user(id, name, password, phone_number, sex, url)
         values(#{id}, #{name}, #{password}, #{phoneNumber}, #{sex}, #{url})
     </insert>
 
     <update id="update">
-        update hjm_user
+        update user_user
         <set>
             <if test="name != null and name != ''">
                 name=#{name},
@@ -83,11 +83,11 @@
     </update>
 
     <delete id="delete">
-        delete from hjm_user where id=#{id}
+        delete from user_user where id=#{id}
     </delete>
 
     <delete id="deleteList">
-        delete from hjm_user where id in
+        delete from user_user where id in
         <foreach collection="list" open="(" separator="," close=")" item="item">
             #{item.id}
         </foreach>

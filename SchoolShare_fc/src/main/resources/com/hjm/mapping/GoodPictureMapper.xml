@@ -4,21 +4,21 @@
 <mapper namespace="com.hjm.dao.GoodPictureDao">
 
     <delete id="delete">
-        delete from hjm_picture
+        delete from good_picture
         where url=#{url}
     </delete>
 
     <delete id="deleteAll">
-        delete from hjm_picture
-        where goodId=#{id}
+        delete from good_picture
+        where good_id=#{id}
     </delete>
 
     <insert id="insert">
-        insert into hjm_picture(url,goodId) values(#{url},#{id})
+        insert into good_picture(url,good_id) values(#{url},#{id})
     </insert>
 
     <insert id="insertList">
-        insert into hjm_picture(url, goodId) values
+        insert into good_picture(url, good_id) values
         <foreach collection="urls" item="item" separator=",">
             <if test="item!=null and item!=''">
                 (#{item}, #{id})

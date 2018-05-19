@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Repository
@@ -35,4 +36,5 @@ public class GoodPictureDaoImpl extends SqlSessionDaoSupport implements GoodPict
     public void insertList(Good good) {
         this.getSqlSession().insert("com.hjm.dao.GoodPictureDao.insertList", good);
     }
+
 }

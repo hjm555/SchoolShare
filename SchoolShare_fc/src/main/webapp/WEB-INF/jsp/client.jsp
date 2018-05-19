@@ -23,7 +23,7 @@
     var websocket = null;
     <%
         User user = (User)request.getAttribute("user");
-        String url = "ws://193.112.163.32/websocket/"+user.getId();
+        String url = "ws://localhost/websocket/"+user.getId();
     %>
     //判断当前浏览器是否支持WebSocket
     if ('WebSocket' in window) {
@@ -50,7 +50,7 @@
         console.info(messages);
         for (var index in messages){
             console.info(messages[index]);
-            setMessageInnerHTML(messages[index].sender.name+':'+messages[index].message);
+            setMessageInnerHTML(messages[index].sender.name+':'+messages[index].content);
         }
     }
 
@@ -78,15 +78,16 @@
     function send() {
         var message = {
             sender: {
-                id: '<%=user.getId()%>'
+                id: '<%=user.getId()%>',
+                name:'<%=user.getName()%>'
             },
             receiver: {
                 id: document.getElementById('target').value
             },
-            message: document.getElementById('text').value,
+            content: document.getElementById('text').value,
         };
         websocket.send(JSON.stringify(message));
-        setMessageInnerHTML('我:'+message.message);
+        setMessageInnerHTML('我:'+message.content);
     }
 </script>
 </html>

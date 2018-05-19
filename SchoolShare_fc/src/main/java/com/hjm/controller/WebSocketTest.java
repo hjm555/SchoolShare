@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.server.standard.SpringConfigurator;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,10 +35,6 @@ public class WebSocketTest {
 
     private String id;
 
-    /**
-     * 连接建立成功调用的方法
-     * @param session  可选的参数。session为与某个客户端的连接会话，需要通过它来给客户端发送数据
-     */
     @OnOpen
     public void onOpen(Session session, @PathParam("userId")String id)throws IOException{
         this.id=id;
@@ -46,14 +43,12 @@ public class WebSocketTest {
         user.setId(id);
         List<Message> list = messageService.getAllMessage(user);
         messageService.update(user);
-        String res = JSON.toJSONString(list, SerializerFeature.DisableCircularReferenceDetect);
+        String res = JSON.toJSONStringWithDateFormat(list, "yyyy-MM-dd HH:mm:ss",SerializerFeature.DisableCircularReferenceDetect);
         logger.info(res);
         session.getBasicRemote().sendText(res);
     }
 
-    /**
-     * 连接关闭调用的方法
-     */
+
     @OnClose
     public void onClose(){
         remove(id);
@@ -86,7 +81,7 @@ public class WebSocketTest {
         map.put(id, session);
     }
 
-    private static synchronized Session get(String id) {
+    static synchronized Session get(String id) {
         return map.get(id);
     }
 

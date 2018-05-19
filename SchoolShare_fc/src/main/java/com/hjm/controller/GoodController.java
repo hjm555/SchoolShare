@@ -42,7 +42,7 @@ public class GoodController {
     public Map homePage(HttpServletRequest request){
         User user = (User)request.getSession().getAttribute("user");
         if (user==null)
-            return ReturnMap.error(12, "用户未登录");
+            return ReturnMap.error(12, "用户未登录",new ArrayList<Good>());
 
         List<Good> goodList=goodService.homePage();
         logger.info("list:");
@@ -56,7 +56,7 @@ public class GoodController {
     public Map insert(@RequestBody Good good,HttpServletRequest request){
         User user = (User)request.getSession().getAttribute("user");
         if (user==null)
-            return ReturnMap.error(12, "用户未登录");
+            return ReturnMap.error(12, "用户未登录",new Good());
         good.setId(UUID.randomUUID().toString());
         good.setOwner(user);
         List<String> urls = (List<String>)request.getSession().getAttribute("urls") ;
@@ -73,15 +73,15 @@ public class GoodController {
     public Map update(@RequestBody Good good, HttpServletRequest request){
         User user = (User)request.getSession().getAttribute("user");
         if (user==null)
-            return ReturnMap.error(12, "用户未登录");
+            return ReturnMap.error(12, "用户未登录",new Good());
 
         List<String> urls = (List<String>)request.getSession().getAttribute("urls") ;
         good.setUrls(urls);
         good.setOwner(user);
-        goodPictureService.deleteAll(good);
         goodPictureService.insertList(good);
         goodService.update(good);
         request.getSession().removeAttribute("urls");
+        good=goodService.getOne(good);
         return ReturnMap.success(good);
     }
 
@@ -93,7 +93,7 @@ public class GoodController {
         //用户登录状态检测
         User user = (User)request.getSession().getAttribute("user");
         if (user==null)
-            return ReturnMap.error(12, "用户未登录");
+            return ReturnMap.error(12, "用户未登录","url is null");
 
         //获得上传文件的全名，在全名中识别出文件类型，根据文件类型由系统生成一个全新的文件名（防止重复）
         // 把文件名保存在newFileName字符串中
@@ -105,14 +105,14 @@ public class GoodController {
         logger.info(newFileName);
 
         //新建文件target，指定其路径（URL）
-        File target = new File(fileConfig.getPath()+"/resources/user/"+user.getId()+"/"+newFileName);
+        File target = new File(fileConfig.getPath()+"/resources/user/"+user.getId()+"/goodPicture/"+newFileName);
         //如果新文件所需的目录不存在，则创建它
         if (!target.getParentFile().exists())
             target.getParentFile().mkdirs();
         //把上传的文件写入target
         file.transferTo(target);
         //使用字符串url保存新文件的URL
-        String url="/resources/user/"+user.getId()+"/"+newFileName;
+        String url="/resources/user/"+user.getId()+"/goodPicture/"+newFileName;
 
         List<String> urls = (List<String>)request.getSession().getAttribute("urls");
         if (urls==null)urls = new ArrayList<>();
@@ -123,13 +123,27 @@ public class GoodController {
         return ReturnMap.success(url);
     }
 
+    @RequestMapping("/releaseCancel")
+    @ResponseBody
+    public Map releaseCancel(HttpServletRequest request){
+        List<String> urls = (List<String>)request.getSession().getAttribute("urls");
+        if(urls==null) return ReturnMap.success("取消成功");
+        for(int i=0;i<urls.size();i++){
+            String url=urls.get(i);
+            File oldPicture=new File(fileConfig.getPath()+url);
+            if(oldPicture.exists()){oldPicture.delete();}
+        }
+        request.getSession().removeAttribute("urls");
+        return ReturnMap.success("取消成功.");
+    }
+
     //pictureDelete方法负责单张物品图片的删除
     @RequestMapping("/pictureDelete")
     @ResponseBody
     public Map pictureDelete(@RequestParam String url,HttpServletRequest request){
         User user = (User)request.getSession().getAttribute("user");
         if (user==null)
-            return ReturnMap.error(12, "用户未登录");
+            return ReturnMap.error(12, "用户未登录","用户未登录");
         //先根据url删掉图片文件
         File oldPicture=new File(fileConfig.getPath()+url);
         if(oldPicture.exists()){oldPicture.delete();}
@@ -142,12 +156,12 @@ public class GoodController {
     //searchByName方法负责提供所有名称与搜索内容相近的物品，并按发布时间的先后顺序返回给前端
     @RequestMapping("/searchByName")
     @ResponseBody
-    public Map searchByName(@RequestParam String goodName,HttpServletRequest request){
+    public Map searchByName(@RequestBody Good good,HttpServletRequest request){
         User user = (User)request.getSession().getAttribute("user");
         if (user==null)
-            return ReturnMap.error(12, "用户未登录");
+            return ReturnMap.error(12, "用户未登录", new ArrayList<Good>());
 
-        List<Good> list=goodService.searchByName(goodName);
+        List<Good> list=goodService.searchByName(good.getName());
         return ReturnMap.success(list);
     }
 
@@ -157,7 +171,7 @@ public class GoodController {
     public Map shareDisplay(HttpServletRequest request){
         User user = (User)request.getSession().getAttribute("user");
         if (user==null)
-            return ReturnMap.error(12, "用户未登录");
+            return ReturnMap.error(12, "用户未登录", new ArrayList<Good>());
         Good good=new Good();
         good.setOwner(user);
         return ReturnMap.success(goodService.getList(good));
@@ -169,7 +183,7 @@ public class GoodController {
     public Map borrowDisplay(HttpServletRequest request){
         User user = (User)request.getSession().getAttribute("user");
         if(user==null)
-            return ReturnMap.error(12,"用户未登录");
+            return ReturnMap.error(12,"用户未登录", new ArrayList<Good>());
 
         Good good=new Good();
         good.setBorrower(user);
@@ -182,18 +196,18 @@ public class GoodController {
     public Map deleteShare(@RequestBody Good good, HttpServletRequest request){
         User user=(User)request.getSession().getAttribute("user");
         if (user==null)
-            return ReturnMap.error(12, "用户未登录");
+            return ReturnMap.error(12, "用户未登录",new Good());
 
         //根据物品对象，删掉所有物品图片，并删除物品图片表和物品表中的相关数据
         good=goodService.getOne(good);
         for(int i=0;i<good.getUrls().size();i++){
             String url=good.getUrls().get(i);
-            File oldPicture=new File("../"+url);
+            File oldPicture=new File(fileConfig.getPath()+url);
             if(oldPicture.exists()){oldPicture.delete();}
         }
         goodPictureService.deleteAll(good);
         goodService.delete(good);
-        return ReturnMap.success(good);
+        return ReturnMap.success("删除成功.");
     }
 
     @RequestMapping("/deleteBorrow")
@@ -201,7 +215,7 @@ public class GoodController {
     public Map deleteBorrow(@RequestBody Good good, HttpServletRequest request){
         User user=(User)request.getSession().getAttribute("user");
         if (user==null)
-            return ReturnMap.error(12, "用户未登录");
+            return ReturnMap.error(12, "用户未登录","用户未登录");
         good.setBorrower(user);
         goodService.deleteBorrow(good);
         return ReturnMap.success("成功删除");
@@ -213,7 +227,7 @@ public class GoodController {
     public Map deleteAllShare(HttpServletRequest request){
         User user=(User)request.getSession().getAttribute("user");
         if (user==null)
-            return ReturnMap.error(12, "用户未登录");
+            return ReturnMap.error(12, "用户未登录","用户未登录");
 
         Good good=new Good();
         good.setOwner(user);
@@ -222,7 +236,7 @@ public class GoodController {
             Good oldGood=goodList.get(i);
             for(int j=0;j<oldGood.getUrls().size();j++){
                 String url=oldGood.getUrls().get(j);
-                File oldPicture=new File("../"+url);
+                File oldPicture=new File(fileConfig.getPath()+url);
                 if(oldPicture.exists()){oldPicture.delete(); }
             }
             goodPictureService.deleteAll(oldGood);
@@ -237,7 +251,7 @@ public class GoodController {
     public Map deleteAllBorrow(HttpServletRequest request){
         User user=(User)request.getSession().getAttribute("user");
         if (user==null)
-            return ReturnMap.error(12, "用户未登录");
+            return ReturnMap.error(12, "用户未登录","用户未登录");
 
         Good good=new Good();
         good.setBorrower(user);

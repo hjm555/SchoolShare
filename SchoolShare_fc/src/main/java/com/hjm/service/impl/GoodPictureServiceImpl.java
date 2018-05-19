@@ -6,6 +6,7 @@ import com.hjm.service.GoodPictureService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @Service
 public class GoodPictureServiceImpl implements GoodPictureService {
@@ -25,4 +26,5 @@ public class GoodPictureServiceImpl implements GoodPictureService {
     public void insertList(Good good) {
         goodPictureDao.insertList(good);
     }
+
 }

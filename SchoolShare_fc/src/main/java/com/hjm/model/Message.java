@@ -6,7 +6,7 @@ public class Message {
     private String id;
     private User sender;        //消息发送者
     private User receiver;      //消息接收者
-    private String message;     //消息内容
+    private String content;     //消息内容
     private Date sendTime;      //发送时间
     private String state;       //消息接收状态
 
@@ -34,12 +34,12 @@ public class Message {
         this.receiver = receiver;
     }
 
-    public String getMessage() {
-        return message;
+    public String getContent() {
+        return content;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public Date getSendTime() {

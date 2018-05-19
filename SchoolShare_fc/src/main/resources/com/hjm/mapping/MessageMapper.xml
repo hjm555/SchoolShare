@@ -4,26 +4,26 @@
 <mapper namespace="com.hjm.dao.MessageDao">
     <resultMap id="msgResult" type="com.hjm.model.Message">
         <id column="id" property="id"/>
-        <result column="message" property="message"/>
+        <result column="content" property="content"/>
         <result column="send_time" property="sendTime"/>
-        <association column="receiverId" property="receiver" select="com.hjm.dao.UserDao.getById"/>
-        <association column="senderId" property="sender" select="com.hjm.dao.UserDao.getById"/>
+        <association column="receiver_id" property="receiver" select="com.hjm.dao.UserDao.getById"/>
+        <association column="sender_id" property="sender" select="com.hjm.dao.UserDao.getById"/>
     </resultMap>
 
     <insert id="sendOne">
-        insert into hjm_message(id, senderId,receiverId,message,state)
-        values(#{id}, #{sender.id},#{receiver.id},#{message},#{state})
+        insert into message_message(id, sender_id,receiver_id,content,state,send_time)
+        values(#{id}, #{sender.id},#{receiver.id},#{content},'未读',CURRENT_TIMESTAMP )
     </insert>
 
     <update id="update">
-        update hjm_message
+        update message_message
         set state='已读'
-        where receiverId=#{id}
+        where receiver_id=#{id}
     </update>
 
     <select id="getAllMessage" resultMap="msgResult">
-        select message,send_time,receiverId,senderId from hjm_message
-        where receiverId=#{id} and (send_time &gt;= CURRENT_TIMESTAMP - 604800000 or state='未读')
+        select content,send_time,receiver_id,sender_id from message_message
+        where (receiver_id=#{id} or sender_id=#{id}) and (send_time &gt;= CURRENT_TIMESTAMP - 604800000 or state='未读')
         order by send_time ASC
     </select>
 </mapper>

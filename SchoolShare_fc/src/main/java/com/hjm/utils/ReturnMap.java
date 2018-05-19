@@ -12,11 +12,11 @@ public class ReturnMap {
         map.put("data", o);
         return map;
     }
-    public static Map<String, Object> error(int code, String msg){
+    public static Map<String, Object> error(int code, String msg, Object o){
         Map<String, Object> map = new HashMap<>();
         map.put("code", code);
         map.put("msg", msg);
-        map.put("data", null);
+        map.put("data", o);
         return map;
     }
 }

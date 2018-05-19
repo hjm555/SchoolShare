@@ -37,7 +37,7 @@ public class UserController {
     @ResponseBody
     public Map check(@RequestBody User user){
         if (userService.getOne(user)!=null)
-            return ReturnMap.error(13, "用户名已存在");
+            return ReturnMap.error(13, "用户名已存在",null);
         return ReturnMap.success(null);
     }
     //register方法负责用户的注册
@@ -49,8 +49,9 @@ public class UserController {
         //将新用户的信息插入到用户表中
         User user1 = new User();
         user1.setName(user.getName());
+        user.setUrl("/resources/DefaultUserHeadPicture.png");
         if(userService.getOne(user1)!=null)
-            return ReturnMap.error(13,"用户名已存在");
+            return ReturnMap.error(13,"用户名已存在",new User());
         user.setId(UUID.randomUUID().toString());
         userService.insert(user);
 
@@ -64,10 +65,10 @@ public class UserController {
     public Map login(@RequestBody User loginUser, HttpServletRequest request){
         if(loginUser.getName()==null || loginUser.getPassword()==null ||
                 "".equals(loginUser.getName()) || "".equals(loginUser.getPassword()))
-            return ReturnMap.error(11, "请输入用户名或密码");
+            return ReturnMap.error(11, "请输入用户名或密码",new User());
         //用户名和密码都不能为空
         if(userService.getOne(loginUser)==null)
-            return ReturnMap.error(10, "用户名或密码错误");
+            return ReturnMap.error(10, "用户名或密码错误",new User());
 
         //根据前端发送过来的User对象，从用户表中查找相关用户,并把查找到的用户对象赋值给新建User对象user
         User user=userService.getOne(loginUser);
@@ -87,10 +88,17 @@ public class UserController {
         //从HttpServletRequest对象中获得当前登录的用户（如果不存在，则提示用户未登录）
         User user = (User)request.getSession().getAttribute("user");
         if (user==null)
-            return ReturnMap.error(12, "用户未登录");
+            return ReturnMap.error(12, "用户未登录",null);
 
         //从HttpServletRequest对象中移除当前登录的用户
-        request.getSession().removeAttribute("user");
+        try{
+            request.getSession().removeAttribute("user");
+            WebSocketTest.get(user.getId()).close();
+        }catch (IOException e){
+            e.printStackTrace();
+            return ReturnMap.error(100, "登出失败", null);
+        }
+
         return ReturnMap.success("logout");
     }
 
@@ -102,7 +110,7 @@ public class UserController {
         //从HttpServletRequest对象中获得当前登录的用户（如果不存在，则提示用户未登录）
         User user = (User)request.getSession().getAttribute("user");
         if (user==null)
-            return ReturnMap.error(12, "用户未登录");
+            return ReturnMap.error(12, "用户未登录",new User());
 
         if (nUser.getId()==null)nUser=user;
         else nUser=userService.getOne(nUser);
@@ -117,15 +125,40 @@ public class UserController {
         //从HttpServletRequest对象中获得当前登录的用户（如果不存在，则提示用户未登录）
         User user = (User)request.getSession().getAttribute("user");
         if (user==null)
-            return ReturnMap.error(12, "用户未登录");
+            return ReturnMap.error(12, "用户未登录",new User());
 
         //更新用户信息
+        User nUser=new User();
+        nUser.setPhoneNumber(newUser.getPhoneNumber());
+        if(userService.getOne(nUser)!=null)
+            return ReturnMap.error(17,"该手机号码已经被使用过",new User());
         userService.update(newUser);
         newUser=userService.getOne(newUser);
         newUser.setPassword(null);
         request.getSession().setAttribute("user", newUser);
         return ReturnMap.success(newUser);
     }
+
+
+    @RequestMapping("/passwordChange")
+    @ResponseBody
+    public Map passwordChange(@RequestBody User newUser, HttpServletRequest request){
+        //从HttpServletRequest对象中获得当前登录的用户（如果不存在，则提示用户未登录）
+        User user = (User)request.getSession().getAttribute("user");
+        if (user==null)
+            return ReturnMap.error(12, "用户未登录",null);
+
+        User user1=new User();
+        user1.setId(newUser.getId());
+        user1.setPassword(newUser.getName());
+        if(userService.getOne(user1)==null){
+            return ReturnMap.error(15,"原密码错误.",null);
+        }
+        user1.setPassword(newUser.getPassword());
+        userService.update(user1);
+        return ReturnMap.success("修改成功");
+    }
+
 
     //upload方法负责用户头像的上传
     @RequestMapping("/profilePhotoUpload")
@@ -135,7 +168,7 @@ public class UserController {
         //从HttpServletRequest对象中获得当前登录的用户（如果不存在，则提示用户未登录）
         User user = (User)request.getSession().getAttribute("user");
         if (user==null)
-            return ReturnMap.error(12, "用户未登录");
+            return ReturnMap.error(12, "用户未登录",new User());
 
         //获得上传文件的全名，在全名中识别出文件类型，根据文件类型由系统生成一个全新的文件名（防止重复）
         // 把文件名保存在newFileName字符串中
@@ -145,14 +178,17 @@ public class UserController {
 
         //获得旧头像的URL链接，根据URL找到旧头像的图片文件并删除
         String oldUrl=user.getUrl();
-        File oldPicture=new File(fileConfig.getPath()+oldUrl);
-        if(oldPicture.exists()){oldPicture.delete();}
+        String defaultUrl="/resources/DefaultUserHeadPicture.png";
+        if(!oldUrl.equals(defaultUrl)){
+            File oldPicture=new File(fileConfig.getPath()+oldUrl);
+            if(oldPicture.exists()){oldPicture.delete();}
+        }
 
         //创立一个新文件，指定其路径（URL）（文件名为上面新生成的文件名）
         //设置新头像的URL链接（指向新文件），更新用户表中相关用户的URL数据
         //通过transferTo方法将上传的文件写入到新文件中
-        File newPicture = new File(fileConfig.getPath()+"/user/"+user.getId()+"/"+newFileName);
-        user.setUrl("/resources/"+"/user/"+user.getId()+"/"+newFileName);
+        File newPicture = new File(fileConfig.getPath()+"/resources/user/"+user.getId()+"/userHeadPicture/"+newFileName);
+        user.setUrl("/resources/user/"+user.getId()+"/userHeadPicture/"+newFileName);
         userService.update(user);
         request.getSession().setAttribute("user", user);
         if (!newPicture.getParentFile().exists())

@@ -6,33 +6,33 @@
         <id column="id" property="id"/>
         <result column="state" property="state"/>
         <result column="request_time" property="requestTime"/>
-        <association column="ownerId" property="owner" select="com.hjm.dao.UserDao.getById"/>
-        <association column="requesterId" property="requester" select="com.hjm.dao.UserDao.getById"/>
-        <association column="goodId" property="good" select="com.hjm.dao.GoodDao.getById"/>
+        <association column="owner_id" property="owner" select="com.hjm.dao.UserDao.getById"/>
+        <association column="requester_id" property="requester" select="com.hjm.dao.UserDao.getById"/>
+        <association column="good_id" property="good" select="com.hjm.dao.GoodDao.getById"/>
     </resultMap>
 
     <select id="getOwnerList" resultMap="requestResult">
-        select * from hjm_sharing_request
-        where ownerId=#{owner.id}
+        select * from good_sharerequest
+        where owner_id=#{id} and state='未处理'
     </select>
 
     <select id="getRequesterList" resultMap="requestResult">
-        select * from hjm_sharing_request
-        where requesterId=#{requester.id}
+        select * from good_sharerequest
+        where requester_id=#{id}
     </select>
 
     <insert id="insert">
-        insert into hjm_sharing_request(id,goodId,ownerId,requesterId,request_time,state)
-        value(#{id},#{good.id},#{owner.id},#{requester.id},#{requestTime},#{state})
+        insert into good_sharerequest(id,good_id,owner_id,requester_id,request_time,state)
+        value(#{id},#{good.id},#{owner.id},#{requester.id},CURRENT_TIMESTAMP,'未处理')
     </insert>
 
     <delete id="delete">
-        delete from hjm_sharing_request
+        delete from good_sharerequest
         where id=#{id}
     </delete>
 
     <update id="update">
-        update hjm_sharing_request
+        update good_sharerequest
         set state='已处理'
         where id=#{id}
     </update>

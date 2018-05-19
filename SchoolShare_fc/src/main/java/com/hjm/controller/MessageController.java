@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/message")
@@ -25,8 +27,9 @@ public class MessageController {
     public Map sendOne(@RequestBody Message message, HttpServletRequest request){
         User user=(User)request.getSession().getAttribute("user");
         if (user==null)
-            return ReturnMap.error(12, "用户未登录");
+            return ReturnMap.error(12, "用户未登录",null);
 
+        message.setId(UUID.randomUUID().toString());
         messageService.sendOne(message);
         return ReturnMap.success("消息发送成功.");
     }
@@ -36,7 +39,7 @@ public class MessageController {
     public Map getAllMessage(HttpServletRequest request){
         User user=(User)request.getSession().getAttribute("user");
         if (user==null)
-            return ReturnMap.error(12, "用户未登录");
+            return ReturnMap.error(12, "用户未登录",new ArrayList<Message>());
 
         List<Message> messageList=messageService.getAllMessage(user);
         messageService.update(user);

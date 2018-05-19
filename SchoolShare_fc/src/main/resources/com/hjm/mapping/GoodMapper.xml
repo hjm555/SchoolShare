@@ -8,17 +8,17 @@
         <result column="type" property="type"/>
         <result column="description" property="description"/>
         <result column="release_time" property="releaseTime"/>
-        <association column="ownerId" property="owner" select="com.hjm.dao.UserDao.getById"/>
+        <association column="owner_id" property="owner" select="com.hjm.dao.UserDao.getById"/>
         <collection  column="id" property="urls" select="selectImage"/>
     </resultMap>
 
     <select id="getById" resultMap="simple">
-        select * from hjm_good
+        select * from good_good
         where id=#{id}
     </select>
 
     <select id="getOne" resultMap="simple">
-        select * from hjm_good
+        select * from good_good
         where 1=1
         <if test="id!=null and id!=''">
             and id=#{id}
@@ -34,18 +34,18 @@
         </if>
         <if test="owner!=null">
             <if test="owner.id!=null and owner.id!=''">
-                and ownerId = #{owner.id}
+                and owner_id = #{owner.id}
             </if>
         </if>
         <if test="borrower!=null">
             <if test="borrower.id!=null and borrower.id!=''">
-                and borrowerId=#{borrower.id}
+                and borrower_id=#{borrower.id}
             </if>
         </if>
     </select>
 
     <select id="getList" resultMap="simple">
-        select * from hjm_good
+        select * from good_good
         where 1=1
         <if test="id!=null and id!=''">
             and id=#{id}
@@ -61,38 +61,38 @@
         </if>
         <if test="owner!=null">
             <if test="owner.id!=null and owner.id!=''">
-                and ownerId = #{owner.id}
+                and owner_id = #{owner.id}
             </if>
         </if>
         <if test="borrower!=null">
             <if test="borrower.id!=null and borrower.id!=''">
-                and borrowerId=#{borrower.id}
+                and borrower_id=#{borrower.id}
             </if>
         </if>
     </select>
 
     <select id="homePage" resultMap="simple">
-        select * from hjm_good where state='未共享'
+        select * from good_good where state='未共享'
         order by release_time DESC
     </select>
 
     <select id="searchByName" resultMap="simple">
-        select * from hjm_good where (name like #{goodName} or description like #{goodName})and state='未共享'
+        select * from good_good where (name like "%"#{goodName}"%" or description like "%"#{goodName}"%" or type like "%"#{goodName}"%")and state='未共享'
         order by release_time DESC
     </select>
 
     <select id="selectImage" resultType="java.lang.String">
-        select url from hjm_picture
-        where goodId = #{id}
+        select url from good_picture
+        where good_id = #{id}
     </select>
 
     <insert id="insert">
-        insert into hjm_good(id,name,type,description,ownerId,release_time)
-        value(#{id},#{name},#{type},#{description},#{owner.id},#{releaseTime})
+        insert into good_good(id,name,type, state, description,owner_id,release_time)
+        value(#{id},#{name},#{type}, '未共享', #{description},#{owner.id}, CURRENT_TIMESTAMP)
     </insert>
 
     <update id="update">
-        update hjm_good
+        update good_good
         <set>
             <if test="name!=null and name!=''">
                 name=#{name},
@@ -103,12 +103,12 @@
             <if test="description!=null">
                 description=#{description},
             </if>
-            <if test="state!=null state!=''">
+            <if test="state!=null and state!=''">
                 state=#{state},
             </if>
             <if test="borrower!=null">
                 <if test="borrower.id!=null and borrower.id!=''">
-                    borrowerId=#{borrower.id},
+                    borrower_id=#{borrower.id},
                 </if>
             </if>
             <if test="releaseTime!=null and releaseTime!=''">
@@ -118,57 +118,57 @@
         where id = #{id}
         <if test="owner!=null">
             <if test="owner.id!=null and owner.id!=''">
-                and ownerId = #{owner.id}
+                and owner_id = #{owner.id}
             </if>
         </if>
     </update>
 
     <update id="updateState">
-        update hjm_good set state='已共享'
+        update good_good set state='已共享'
         where id=#{id}
     </update>
 
     <update id="deleteBorrow">
-        update hjm_good
+        update good_good
         <set>
             <if test="borrower!null">
                 <if test="borrower.id!=null and borrower.id!=''">
-                    borrowId='null',
+                    borrower_id='null',
                 </if>
             </if>
         </set>
-        where borrowId=#{borrower.id} and id=#{id}
+        where borrow_id=#{borrower.id} and id=#{id}
     </update>
 
     <update id="deleteAllBorrow">
-        update hjm_good
+        update good_good
         <set>
             <if test="borrower!null">
                 <if test="borrower.id!=null and borrower.id!=''">
-                    borrowId='null',
+                    borrower_id='null',
                 </if>
             </if>
         </set>
-        where borrowId=#{borrower.id}
+        where borrower_id=#{borrower.id}
     </update>
 
     <delete id="delete">
-        delete from hjm_good where id=#{id}
+        delete from good_good where id=#{id}
     </delete>
 
     <delete id="deleteList">
-        delete from hjm_good where id in
+        delete from good_good where id in
         <foreach collection="list" open="(" separator="," close=")" item="item">
             #{item.id}
         </foreach>
     </delete>
 
     <delete id="deleteAll">
-        delete from hjm_good_share where 1=1
+        delete from good_good where 1=1
         <set>
             <if test="owner!=null">
                 <if test="owner.id!=null and owner.id!=''">
-                    and ownerId in
+                    and owner_id in
                     <foreach collection="list" open="(" separator="," close=")" item="item">
                         #{item.id}
                     </foreach>
@@ -176,7 +176,7 @@
             </if>
             <if test="borrower!=null">
                 <if test="borrower.id!=null and borrow.id!=''">
-                    and borrowId in
+                    and borrower_id in
                     <foreach collection="list" open="(" separator="," close=")" item="item">
                         #{item.id}
                     </foreach>
